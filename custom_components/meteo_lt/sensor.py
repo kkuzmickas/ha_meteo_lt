@@ -1,36 +1,33 @@
-from homeassistant.components.sensor import SensorEntity
-from .const import DOMAIN
+from homeassistant.helpers.entity import Entity
+from .const import DOMAIN, API_BASE
+import requests
 
-SENSOR_TYPES = {
-    "temperature": "Current Temperature",
-    "condition": "Weather Condition",
-    "wind_speed": "Wind Speed",
-    "humidity": "Humidity"
-}
-
-async def async_setup_entry(hass, entry, async_add_entities):
-    coordinator = hass.data[DOMAIN][entry.entry_id]
-    sensors = [MeteoLtSensor(coordinator, key, name) for key, name in SENSOR_TYPES.items()]
-    async_add_entities(sensors)
-
-class MeteoLtSensor(SensorEntity):
-    def __init__(self, coordinator, sensor_type, name):
-        self.coordinator = coordinator
-        self.sensor_type = sensor_type
-        self._name = name
-        self._attr_unique_id = f"{coordinator.location_id}_{sensor_type}"
+class MeteoLtSensor(Entity):
+    def __init__(self, location):
+        self._location = location
+        self._state = None
+        self._attributes = {}
 
     @property
     def name(self):
-        return self._name
+        return f"Meteo LT {self._location}"
 
     @property
     def state(self):
-        data = self.coordinator.data
-        if not data or "forecastTimestamps" not in data:
-            return None
-        current = data["forecastTimestamps"][0]
-        return current.get(self.sensor_type)
+        return self._state
 
-    async def async_update(self):
-        await self.coordinator.async_request_refresh()
+    @property
+    def extra_state_attributes(self):
+        return self._attributes
+
+    def update(self):
+        # Fetch weather data
+        url = f"{API_BASE}/places/{self._location}/forecasts/long-term"
+        response = requests.get(url)
+        if response.ok:
+            data = response.json()
+            self._state = data.get("forecastTimestamps")[0]["airTemperature"]
+            self._attributes = {
+                "condition": data.get("forecastTimestamps")[0]["conditionCode"],
+                "windSpeed": data.get("forecastTimestamps")[0]["windSpeed"]
+            }
