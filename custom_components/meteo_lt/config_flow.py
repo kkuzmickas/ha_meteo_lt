@@ -1,28 +1,37 @@
-import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
+import voluptuous as vol
 from .const import DOMAIN
-from .api import MeteoLTApi
 
+# Example list of locations. Replace with the real ones or fetch dynamically.
+LOCATIONS = [
+    ("location1", "Vilnius"),
+    ("location2", "Kaunas"),
+    ("location3", "Klaipėda")
+]
 
-class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-async def async_step_user(self, user_input=None):
-session = async_get_clientsession(self.hass)
-api = MeteoLTApi(session, "vilnius")
-places = await api.get_places()
+class SolplanetConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Handle a config flow for Solplanet."""
 
+    VERSION = 1
 
-choices = {p["code"]: f"{p['name']} ({p['administrativeDivision']})" for p in places}
+    async def async_step_user(self, user_input=None):
+        """Handle the initial step."""
+        errors = {}
 
+        if user_input is not None:
+            # Save selected location
+            return self.async_create_entry(
+                title=user_input["location"],
+                data=user_input
+            )
 
-schema = vol.Schema({vol.Required("place"): vol.In(choices)})
+        # Show dropdown menu
+        schema = vol.Schema({
+            vol.Required("location"): vol.In({key: name for key, name in LOCATIONS})
+        })
 
-
-if user_input is not None:
-return self.async_create_entry(
-title=f"Meteo.lt ({choices[user_input['place']]})",
-data={"place": user_input["place"]},
-)
-
-
-return self.async_show_form(step_id="user", data_schema=schema)
+        return self.async_show_form(
+            step_id="user",
+            data_schema=schema,
+            errors=errors
+        )
