@@ -1,3 +1,5 @@
-DOMAIN = "meteo_lt"
-API_BASE = "https://api.meteo.lt/v1"
-DEFAULT_SCAN_INTERVAL = 900
+DOMAIN = "meteolt"
+LOCATIONS_URL = "https://api.meteo.lt/v1/places"
+WEATHER_URL = "https://api.meteo.lt/v1/places/{location_id}/forecasts/long-term"
+CONF_LOCATION_ID = "location_id"
+CONF_LOCATION_NAME = "location_name"
