@@ -1,25 +1,26 @@
 import aiohttp
 import voluptuous as vol
 from homeassistant import config_entries
-from .const import DOMAIN
-
-LOCATIONS_URL = "https://api.meteo.lt/v1/places"
+from .const import DOMAIN, LOCATIONS_URL, CONF_LOCATION_ID, CONF_LOCATION_NAME
 
 class MeteoLtConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for meteo.lt."""
-
     VERSION = 1
 
     async def async_step_user(self, user_input=None):
         errors = {}
 
         if user_input is not None:
+            # Save the selected location
+            location_name = user_input["location_id_name"]
             return self.async_create_entry(
-                title=user_input["location_name"],
-                data=user_input
+                title=location_name,
+                data={
+                    CONF_LOCATION_ID: user_input["location_id"],
+                    CONF_LOCATION_NAME: location_name
+                }
             )
 
-        # Fetch locations dynamically
+        # Fetch available locations
         locations = await self._fetch_locations()
         if not locations:
             errors["base"] = "cannot_connect"
@@ -31,14 +32,9 @@ class MeteoLtConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             vol.Required("location_id"): vol.In(options)
         })
 
-        return self.async_show_form(
-            step_id="user",
-            data_schema=schema,
-            errors=errors
-        )
+        return self.async_show_form(step_id="user", data_schema=schema, errors=errors)
 
     async def _fetch_locations(self):
-        """Fetch available locations from meteo.lt API."""
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(LOCATIONS_URL, timeout=10) as resp:
