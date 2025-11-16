@@ -1,9 +1,9 @@
 {
   "domain": "meteo_lt",
-  "name": "Meteo.lt Weather",
+  "name": "Meteo LT",
   "version": "1.0.0",
-  "documentation": "https://www.meteo.lt",
-  "requirements": ["aiohttp>=3.8.5"],
+  "documentation": "https://github.com/kkuzmickas/ha_meteo_lt",
+  "requirements": ["requests>=2.28"],
   "dependencies": [],
   "codeowners": ["@kkuzmickas"],
   "config_flow": true
