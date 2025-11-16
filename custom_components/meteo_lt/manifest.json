@@ -1,0 +1,10 @@
+{
+  "domain": "meteo_lt",
+  "name": "Lithuanian Hydrometeorological Service (meteo.lt)",
+  "documentation": "https://github.com/kkuzmickas/ha_meteo_lt",
+  "dependencies": [],
+  "codeowners": ["@kkuzmickas"],
+  "iot_class": "cloud_polling",
+  "version": "0.1.0",
+  "requirements": []
+}
