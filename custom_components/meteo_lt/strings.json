@@ -1,0 +1,13 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Select Meteo.lt location",
+        "description": "Choose a place for weather forecasting",
+        "data": {
+          "place": "Place"
+        }
+      }
+    }
+  }
+}
