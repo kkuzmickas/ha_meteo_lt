@@ -1,19 +1,17 @@
-from homeassistant.config_entries import ConfigEntry
+"""Meteo LT integration"""
 from homeassistant.core import HomeAssistant
-from .const import DOMAIN
-from .coordinator import MeteoLtDataUpdateCoordinator
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
-    coordinator = MeteoLtDataUpdateCoordinator(hass, entry.data)
-    await coordinator.async_config_entry_first_refresh()
+DOMAIN = "meteo_lt"
 
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
-
-    # Forward to sensor platform
-    hass.config_entries.async_setup_platforms(entry, ["sensor"])
+async def async_setup(hass: HomeAssistant, config: dict):
+    """Set up the Meteo LT integration from YAML (optional)."""
     return True
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
-    await hass.config_entries.async_unload_platforms(entry, ["sensor"])
-    hass.data[DOMAIN].pop(entry.entry_id)
+async def async_setup_entry(hass: HomeAssistant, entry):
+    """Set up Meteo LT from a config entry."""
+    hass.data.setdefault(DOMAIN, {})
+    return True
+
+async def async_unload_entry(hass: HomeAssistant, entry):
+    """Unload a config entry."""
     return True
